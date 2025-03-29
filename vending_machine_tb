@@ -1,0 +1,56 @@
+module vending_machine_tb;
+
+    // Testbench Signals
+    logic clk, reset;
+    logic T3, R2, U1;
+    logic [7:0] coin;
+    logic [6:0] display;
+
+    // Instantiate the DUT (Device Under Test)
+    vending_machine dut (
+        .clk(clk),
+        .reset(reset),
+        .T3(T3),
+        .R2(R2),
+        .U1(U1),
+        .coin(coin),
+        .display(display)
+    );
+
+    // Clock Generator
+    always #5 clk = ~clk;  // 10ns clock period
+
+    initial begin
+        // Initialize signals
+        clk = 0;
+        reset = 1;
+        T3 = 0; R2 = 0; U1 = 0; coin = 0;
+        #10 reset = 0;  // Release reset
+
+        // Test Case 1: Select Tea (₹5)
+        #10 T3 = 1; coin = 5;
+        #10 T3 = 0;
+
+        // Test Case 2: Select Coffee (₹10)
+        #10 R2 = 1; coin = 10;
+        #10 R2 = 0;
+
+        // Test Case 3: Select Lemon Tea (₹20)
+        #10 U1 = 1; coin = 20;
+        #10 U1 = 0;
+
+        // Test Case 4: Incorrect Coin (₹15 for Tea)
+        #10 T3 = 1; coin = 15;
+        #10 T3 = 0;
+
+        // End Simulation
+        #20 $finish;
+    end
+
+    // Monitor Output
+    initial begin
+        $monitor("Time=%0t | T3=%b R2=%b U1=%b | Coin=%d | Display=%b",
+                 $time, T3, R2, U1, coin, display);
+    end
+
+endmodule
